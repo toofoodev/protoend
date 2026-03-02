@@ -1,19 +1,27 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
+
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server);
 
 let onlineUsers = 0;
 
-app.get("/track", (req, res) => {
+io.on("connection", (socket) => {
     onlineUsers++;
-    console.log("Online Users:", onlineUsers);
-    res.send("User counted");
+    console.log("User connected:", onlineUsers);
+    io.emit("userCount", { onlineUsers });
+    console.log("[Protoend] Users online: ", onlineUsers);
+
+    socket.on("disconnect", () => {
+        onlineUsers--;
+        console.log("User disconnected:", onlineUsers);
+        io.emit("userCount", { onlineUsers });
+        console.log("[Protoend] Users online: ", onlineUsers);
+    });
 });
 
-app.get("/count", (req, res) => {
-    res.json({ onlineUsers });
-});
-
+server.listen(process.env.PORT || 3000);
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+console.log("[Protoend] Server is running!");
