@@ -6,6 +6,7 @@ let onlineUsers = 0;
 app.get("/track", (req, res) => {
     onlineUsers++;
     console.log("Online Users:", onlineUsers);
+    res.send("User counted");
 });
 
 app.get("/count", (req, res) => {
